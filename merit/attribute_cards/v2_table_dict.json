@@ -1,0 +1,165 @@
+{
+    "material": [
+      "wood",
+      "metal",
+      "glass",
+      "plastic",
+      "fabric",
+      "leather",
+      "marble",
+      "bamboo",
+      "rattan",
+      "steel",
+      "aluminum",
+      "acrylic",
+      "veneer"
+    ],
+    "color": [
+      "black",
+      "white",
+      "brown",
+      "gray",
+      "natural wood",
+      "blue",
+      "green",
+      "red",
+      "gold",
+      "silver",
+      "walnut",
+      "oak",
+      "clear",
+      "beige"
+    ],
+    "shape": [
+      "rectangular",
+      "round",
+      "square",
+      "oval",
+      "l-shaped",
+      "c-shaped",
+      "triangular",
+      "hexagonal",
+      "u-shaped",
+      "curved"
+    ],
+    "table type": [
+      "coffee table",
+      "side table",
+      "end table",
+      "console table",
+      "dining table",
+      "desk",
+      "nightstand",
+      "accent table",
+      "folding table",
+      "nesting table",
+      "lift top table",
+      "pedestal table"
+    ],
+    "style": [
+      "modern",
+      "rustic",
+      "industrial",
+      "contemporary",
+      "traditional",
+      "minimalist",
+      "farmhouse",
+      "mid-century modern",
+      "scandinavian",
+      "vintage",
+      "bohemian",
+      "coastal"
+    ],
+    "number of drawers": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "no drawers"
+    ],
+    "features": [
+      "adjustable height",
+      "foldable",
+      "storage shelves",
+      "built-in charging port",
+      "cup holder",
+      "waterproof",
+      "scratch-resistant",
+      "easy assembly",
+      "hidden storage",
+      "extendable",
+      "keyboard tray",
+      "cable management",
+      "monitor stand"
+    ],
+    "room/location": [
+      "living room",
+      "dining room",
+      "bedroom",
+      "office",
+      "kitchen",
+      "entryway",
+      "patio",
+      "bathroom"
+    ],
+    "assembly required": [
+      "yes",
+      "no",
+      "minimal assembly",
+      "professional assembly recommended"
+    ],
+    "table base": [
+      "four legs",
+      "pedestal",
+      "trestle",
+      "hairpin legs",
+      "metal frame",
+      "x-frame",
+      "c-shaped"
+    ],
+    "pattern/print": [
+      "solid color",
+      "wood grain",
+      "marble print",
+      "geometric pattern",
+      "floral",
+      "striped"
+    ],
+    "seating capacity": [
+      "2",
+      "4",
+      "6",
+      "8",
+      "10",
+      "12"
+    ],
+    "wheels": [
+      "yes",
+      "no",
+      "lockable wheels"
+    ],
+    "storage options": [
+      "drawers",
+      "shelves",
+      "hidden compartment",
+      "open storage",
+      "cabinet"
+    ],
+    "extendable": [
+      "yes",
+      "no",
+      "drop leaf"
+    ],
+    "foldable": [
+      "yes",
+      "no"
+    ],
+    "water resistance": [
+      "waterproof",
+      "water-resistant",
+      "not water-resistant"
+    ]
+  }
