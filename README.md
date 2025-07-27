@@ -87,6 +87,8 @@ test_queries = read_json_data(f"{<YOUR SAVE DIR>}/queries-test.json")
 
 3️⃣ How to use the dataset (use test set as example)
 
+⚠️ The test set's candidate pool is all the test products (51177 in total)
+
 ```python
 # Create an inverted index table for products"
 # It may cost some time, if you want to accelerate:
