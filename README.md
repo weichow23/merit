@@ -16,7 +16,7 @@ Ran Zhou<sup>1</sup>, Yi Zeng<sup>1</sup>, Yidong Cai<sup>1</sup>, Botian Jiang<
 [![GitHub](https://img.shields.io/badge/GitHub-Repo-181717?logo=github)](https://github.com/weichow23/merit)
 [![Page](https://img.shields.io/badge/Home-Page-b3.svg)](https://merit-2025.github.io)
 
-<h4 style="color: #d32f2f; font-weight: bold;">NeurIPS 2025</h4>
+<h3 style="color: #d32f2f; font-weight: bold;">NeurIPS 2025</h3>
 </div>
 
 ## 🚀 Project Introduction
