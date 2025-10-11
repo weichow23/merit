@@ -1,0 +1,50 @@
+### CORAL
+pretrained_decoder: null
+decoder_lr: 1e-4
+l_mask_prob: 0.5
+v_mask_prob: 0.5
+lambda_l: 0.1
+lambda_v: 0.1
+contrastive_temp: 0.02
+negatives_cross_device: true
+use_inbatch_neg: true
+select_embed: "last"
+
+### Mode Args
+model_base: qwen2.5vl
+model_type: coralwneg
+model_name: ./checkpoint/Qwen2.5-VL-3B-Instruct
+model_max_length: 4096
+max_image_token: 576
+
+### Data Args
+data_path: ../data/*
+
+### Training Args
+project_name: MERIT
+run_name: coral_demo
+output_dir: ./checkpoint/qwen25vl_merit_coral_demo
+num_train_epochs: 1
+learning_rate: 1e-4
+weight_decay: 0.0005
+warmup_ratio: 0.01
+freeze_vision_tower: true
+per_device_train_batch_size: 4
+logging_steps: 1
+save_strategy: "steps" 
+save_steps: 1000
+save_total_limit: 5
+bf16: true
+fp16: false
+
+lora_enable: false
+lora_r: 8
+lora_alpha: 16
+lora_bias: none
+lora_dropout: 0.05
+
+gradient_checkpointing: true
+gradient_accumulation_steps: 2
+dataloader_num_workers: 12
+deepspeed: configs/deepspeed_zero2.json  
+report_to: []

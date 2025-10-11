@@ -1,0 +1,4 @@
+.vscode
+*__pycache__
+/coral/wandb
+/coral/checkpoint

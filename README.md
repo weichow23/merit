@@ -12,9 +12,9 @@ Ran Zhou<sup>1</sup>, Yi Zeng<sup>1</sup>, Yidong Cai<sup>1</sup>, Botian Jiang<
 
 [![arXiv](https://img.shields.io/badge/arXiv-2506.03144-b31b1b.svg)](https://arxiv.org/abs/2506.03144)
 [![Dataset](https://img.shields.io/badge/🤗%20Huggingface-Dataset-yellow)](https://huggingface.co/datasets/WeiChow/merit)
-[![Checkpoint](https://img.shields.io/badge/🤗%20Huggingface-CKPT-blue)]()
+[![Checkpoint](https://img.shields.io/badge/🤗%20Huggingface-CKPT-blue)](https://huggingface.co/Bia/CORAL)
 [![GitHub](https://img.shields.io/badge/GitHub-Repo-181717?logo=github)](https://github.com/weichow23/merit)
-[![Page](https://img.shields.io/badge/Home-Page-b3.svg)](https://merit-2025.github.io//)
+[![Page](https://img.shields.io/badge/Home-Page-b3.svg)](https://merit-2025.github.io)
 </div>
 
 ## 🚀 Project Introduction
@@ -89,6 +89,8 @@ test_queries = read_json_data(f"{<YOUR SAVE DIR>}/queries-test.json")
 
 ⚠️ The test set's candidate pool is all the test products (51177 in total)
 
+⚠️ Of course, we strongly recommend that you convert the parquet to local image and json for organization, otherwise you will need to spend a lot of time on reorganizing product_map every time you run
+
 ```python
 # Create an inverted index table for products"
 # It may cost some time, if you want to accelerate:
@@ -135,18 +137,84 @@ Recognizing neglecting specific conditional elements in queries as a primary sou
 ![](https://merit-2025.github.io/static/images/part3/method.png)
 
 ### 🔥 Quick Start
-Coming soon!
+Our released Coral model is based on Qwen implementation. You can find our pre-trained weights at [![Checkpoint](https://img.shields.io/badge/🤗%20Huggingface-CKPT-blue)](https://huggingface.co/Bia/CORAL).
+
+First, you need to enter the `coral` directory and use it as the root directory.
+
+```markdown
+.
+├── argument 
+│   ├── arguments.py
+├── configs
+│   └── deepspeed_zero2.json
+├── data
+│   ├── conversation.py
+│   └── dataset.py
+├── model
+│   ├── enhancedDecoder.py
+│   ├── modeling_base.py
+│   ├── modeling_cl.py
+│   └── modeling_coral.py
+├── README.md
+├── scripts
+│   ├── run_infer.py
+│   └── run_train.py
+├── setup.sh
+├── trainer
+│   └── trainer.py
+└── yamls
+    └── cora_demo.yaml
+```
 
 1️⃣ Set up environment
 
+To train Coral, you need to install the following additional dependencies:
+```shell
+bash setup.sh
+```
 
-2️⃣ Download pretrained checkpoint
+2️⃣ Inference
+After downloading the pre-trained weights, you need to perform inference separately on queries and candidates. The inference outputs will be .npy files. Then you need to calculate the similarity to obtain the top 10 most similar products as the retrieval results for each query.
+
+To launch the inference script, you need to format your data as follows:
+
+⚠️ Here we suggest you store the data from [![Dataset](https://img.shields.io/badge/🤗%20Huggingface-Dataset-yellow)](https://huggingface.co/datasets/WeiChow/merit) as JSON files and local JPG images for loading, and process them into conversation format. Specifically, here is an example of a query:
+
+```json
+{"id": 291, "conversations": [{"from": "human", "value": "Find a product of shoes that have the same closure type with <Product 1> <image>\n\u0e23\u0e2d\u0e07\u0e40\u0e17\u0e49\u0e32\u0e41\u0e15\u0e30\u0e40\u0e14\u0e47\u0e01\u0e0a\u0e32\u0e22\u0e25\u0e32\u0e22\u0e40\u0e1a\u0e47\u0e19\u0e40\u0e17\u0e47\u0e19 2 \u0e40\u0e17\u0e1b\u0e1b\u0e23\u0e31\u0e1a\u0e2a\u0e32\u0e22\u0e44\u0e14\u0e49 \u0e23\u0e38\u0e48\u0e19 SD460 </Product 1> and the same color with <Product 2> <image>\n\u0e40\u0e0b\u0e17\u0e1c\u0e25\u0e44\u0e21\u0e49\u0e1f\u0e23\u0e35\u0e0b\u0e14\u0e23\u0e32\u0e22 \u0e2a\u0e15\u0e2d\u0e40\u0e1a\u0e2d\u0e23\u0e35\u0e48 35 \u0e01\u0e23\u0e31\u0e21 + \u0e17\u0e38\u0e40\u0e23\u0e35\u0e22\u0e19 35 \u0e01\u0e23\u0e31\u0e21 </Product 2>, featuring a superhero theme."}], "pos_cand_list": ["1731463903574001768", "1731463903574067304"], "image": ["xxxx.jpg", "yyyjpg"]}
+```
+💡: Please don't be surprised if it is displayed as `\u..`. It is not garbled, but because our data contains languages ​​such as 🇹🇭Thai.
+
+"id" represents the query index, "conversations" is used for Qwen inference, "pos_cand_list" contains the correct product retrieval results, and "image" contains local image paths that replace the two <image> placeholders in conversations. The conversations include the images and product titles of the two products after the instruction.
+
+Here is an example of a candidate:
+```json
+{"id": "1730256425535310625", "conversations": [{"from": "human", "value": "Represent the given product: <image>\nBalo HiP th\u1eddi trang H\u00e0n Qu\u1ed1c, ch\u1ea5t li\u1ec7u v\u1ea3i oxford ch\u1ed1ng n\u01b0\u1edbc, k\u00edch th\u01b0\u1edbc 31*13*40cm, ph\u00f9 h\u1ee3p laptop 15.6 inch."}], "image": "zzzz.jpg"}
+```
+
+Run infererence:
+```shell
+python3 scripts/run_infer.py \
+    --model_name $model_path \
+    --data_path $data_path \
+    --max_image_token 576 \
+    --tgt_folder $target_folder \
+    --batch_size 1 \
+    --world_size $WORLD_SIZE \
+    --DDP_port $DDP_PORT
+```
 
 
 3️⃣ Eval
+see [below](https://github.com/weichow23/merit?tab=readme-ov-file#%EF%B8%8F-usage)
 
 ### 🏋️ Training
-Coming soon!
+For training, you also need to organize the data in conversation format as JSON files. You can refer to the `2️⃣ Inference` section above.
+
+Run training:
+```shell
+torchrun --node_rank=0 --nproc_per_node=$WORLD_SIZE --nnodes=$NN_NODES --master_port=$MASTER_PORT scripts/run_train.py --conf yamls/cora_demo.yaml
+```
 
 ## ✍️ Citation
 ```
