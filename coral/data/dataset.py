@@ -220,7 +220,21 @@ class InferenceDataset(Dataset):
     Dataset for inference tasks, such as embedding generation. It can filter out
     samples that have already been processed.
     """
-    def __init__(self, data_path: str, tgt_folder: str, processor, max_img_num: int = 8, max_text_length: int = 1024):
+    def __init__(self, data_path: str, tgt_folder: str, processor, max_img_num: int = 8, max_text_length: int = 1024,
+                 existing_ids: set = None):
+        """
+        Args:
+            existing_ids (set, optional): Precomputed set of already-processed sample IDs
+                (as strings), shared identically across all DDP ranks. When running under
+                DDP, this MUST be computed once (e.g. on rank 0) and broadcast to every
+                rank before this dataset is constructed. If each rank instead scans
+                `tgt_folder` independently via `os.path.exists`, faster ranks can finish
+                writing .npy files while slower ranks are still starting up, so different
+                ranks end up filtering `self.data` to different lengths. DistributedSampler
+                partitions indices based on `len(self.data)`, so a mismatch here causes
+                samples to be silently skipped. Pass `existing_ids=None` only for
+                single-process (non-DDP) runs, where this race condition cannot occur.
+        """
         self.max_img_num = max_img_num
         self.max_text_length = max_text_length
         self.processor = processor
@@ -237,11 +251,15 @@ class InferenceDataset(Dataset):
 
         logger.info(f"Total samples found: {len(self.data)}")
         
-        # Filter out samples for which an output file already exists in the target folder
+        # Filter out samples for which an output file already exists in the target folder.
         # This is useful for resuming large, interruptible inference jobs.
+        if existing_ids is None:
+            existing_ids = {
+                os.path.splitext(f)[0] for f in os.listdir(tgt_folder) if f.endswith('.npy')
+            } if os.path.isdir(tgt_folder) else set()
         self.data = [
-            item for item in self.data 
-            if not os.path.exists(os.path.join(tgt_folder, str(item["id"]) + '.npy'))
+            item for item in self.data
+            if str(item["id"]) not in existing_ids
         ]
         logger.info(f"Filtered samples to process: {len(self.data)}")
 
