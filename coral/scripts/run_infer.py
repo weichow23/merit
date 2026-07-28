@@ -67,12 +67,28 @@ def inference(rank: int, world_size: int, args: argparse.Namespace):
     cl_model = BaseForSCL(encoder_model=model, config=model.config, select_embed="last", inference=True)
 
     # --- 3. Data Loading ---
-    # Create the dataset. It automatically filters out already-processed items.
+    # Take a single snapshot of already-processed IDs on rank 0 and broadcast it to
+    # every rank. Without this, each rank would scan `tgt_folder` independently, and a
+    # later-starting rank could see .npy files written by a faster rank in the meantime.
+    # That causes each rank to filter its copy of the dataset to a different length,
+    # which desyncs DistributedSampler's partitioning and silently skips samples.
+    if rank == 0:
+        existing_ids = {
+            os.path.splitext(f)[0] for f in os.listdir(args.tgt_folder) if f.endswith('.npy')
+        }
+    else:
+        existing_ids = None
+    id_holder = [existing_ids]
+    dist.broadcast_object_list(id_holder, src=0)
+    existing_ids = id_holder[0]
+
+    # Create the dataset. It filters out already-processed items using the shared snapshot.
     infer_set = InferenceDataset(
         data_path=args.data_path,
         tgt_folder=args.tgt_folder,
         processor=processor,
-        max_img_num=args.max_img_num
+        max_img_num=args.max_img_num,
+        existing_ids=existing_ids
     )
     
     # DistributedSampler ensures each GPU gets a unique, non-overlapping slice of the data.
